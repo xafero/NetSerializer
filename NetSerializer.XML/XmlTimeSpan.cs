@@ -3,7 +3,6 @@ using System.Xml.Serialization;
 
 namespace NetSerializer.XML
 {
-    [XmlRoot(nameof(TimeSpan))]
     public class XmlTimeSpan
     {
         private TimeSpan _value;

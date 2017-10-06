@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using NetSerializer.API;
@@ -30,6 +31,8 @@ namespace NetSerializer.XML
             var rawType = type;
             if (rawType == typeof(TimeSpan))
                 rawType = typeof(XmlTimeSpan);
+            if (rawType == typeof(TimeSpan[]))
+                rawType = typeof(XmlTimeSpan[]);
             Xmler xml;
             if (!serializers.TryGetValue(rawType, out xml))
                 serializers[type] = xml = new Xmler(rawType);
@@ -45,6 +48,8 @@ namespace NetSerializer.XML
                 object raw = input;
                 if (raw is TimeSpan)
                     raw = (XmlTimeSpan) (TimeSpan) raw;
+                if (raw is TimeSpan[])
+                    raw = ((TimeSpan[]) raw).Select(t => (XmlTimeSpan) t).ToArray();
                 serializer.Serialize(xmlWriter, raw, xns);
                 return writer.ToString();
             }
@@ -58,6 +63,8 @@ namespace NetSerializer.XML
                 var raw = serializer.Deserialize(reader);
                 if (raw is XmlTimeSpan)
                     raw = (TimeSpan) (XmlTimeSpan) raw;
+                if (raw is XmlTimeSpan[])
+                    raw = ((XmlTimeSpan[]) raw).Select(t => (TimeSpan) t).ToArray();
                 return (O) raw;
             }
         }
