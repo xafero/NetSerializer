@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -30,12 +29,14 @@ namespace NetSerializer.XML
             Mappings = new Dictionary<Type, Type>
             {
                 {typeof(TimeSpan), typeof(XmlTimeSpan)},
-                {typeof(TimeSpan[]), typeof(XmlTimeSpan[])},
+                {typeof(TimeSpan[]), typeof(XmlTimeSpan[])}
             };
         }
 
         private Xmler GetXmler(Type type)
         {
+            if (typeof(IDictionary).IsAssignableFrom(type))
+                type = typeof(XmlDictionary<,>).MakeGenericType(type.GetGenericArguments());
             Type rawType;
             if (!Mappings.TryGetValue(type, out rawType))
                 if (type.IsGenericType)
@@ -87,6 +88,7 @@ namespace NetSerializer.XML
         private object ChangeConvert(object input)
         {
             ICollection coll;
+            IDictionary dict;
             var raw = input;
             if (raw is TimeSpan)
                 raw = (XmlTimeSpan) (TimeSpan) raw;
@@ -96,11 +98,27 @@ namespace NetSerializer.XML
                 raw = (TimeSpan) (XmlTimeSpan) raw;
             else if (raw is XmlTimeSpan[])
                 raw = ((XmlTimeSpan[]) raw).Select(t => (TimeSpan) t).ToArray();
+            else if ((dict = raw as IDictionary) != null)
+            {
+                var args = raw.GetType().GetGenericArguments();
+                Type mappedKey;
+                Type mappedVal;
+                if (!TryGetValue(args.First(), out mappedKey)) mappedKey = args.First();
+                if (!TryGetValue(args.Last(), out mappedVal)) mappedVal = args.Last();
+                var mapped = typeof(XmlDictionary<,>).MakeGenericType(mappedKey, mappedVal);
+                dynamic container = Activator.CreateInstance(mapped);
+                foreach (dynamic item in dict)
+                {
+                    var rawKey = ChangeConvert(item.Key);
+                    var rawVal = ChangeConvert(item.Value);
+                    container.Add(rawKey, rawVal);
+                }
+                raw = container;
+            }
             else if ((coll = raw as ICollection) != null)
             {
                 Type mapped;
-                if (Mappings.TryGetValue(raw.GetType(), out mapped)
-                    || (mapped = Mappings.FirstOrDefault(m => m.Value == raw.GetType()).Key) != null)
+                if (TryGetValue(raw.GetType(), out mapped))
                 {
                     dynamic container = Activator.CreateInstance(mapped);
                     foreach (var item in coll)
@@ -113,5 +131,9 @@ namespace NetSerializer.XML
             }
             return raw;
         }
+
+        private bool TryGetValue(Type raw, out Type mapped)
+            => Mappings.TryGetValue(raw, out mapped)
+               || (mapped = Mappings.FirstOrDefault(m => m.Value == raw).Key) != null;
     }
 }

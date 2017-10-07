@@ -19,6 +19,7 @@ namespace NetSerializer.Test
             TestPrimSerialize(seri);
             TestArraySerialize(seri);
             TestListSerialize(seri);
+            TestDictSerialize(seri);
         }
 
         [Test]
@@ -28,6 +29,7 @@ namespace NetSerializer.Test
             TestPrimSerialize(seri);
             TestArraySerialize(seri);
             TestListSerialize(seri);
+            TestDictSerialize(seri);
         }
 
         [Test]
@@ -37,6 +39,35 @@ namespace NetSerializer.Test
             TestPrimSerialize(seri);
             TestArraySerialize(seri);
             TestListSerialize(seri);
+            TestDictSerialize(seri);
+        }
+
+        private static void TestDictSerialize(ISerializer<string> serializer)
+        {
+            TestDictSerialize<byte>(serializer, 127, 128);
+            TestDictSerialize<sbyte>(serializer, -128, -127);
+            TestDictSerialize(serializer, 42, 43);
+            TestDictSerialize(serializer, 42u, 43u);
+            TestDictSerialize<short>(serializer, 42, 43);
+            TestDictSerialize<ushort>(serializer, 42, 43);
+            TestDictSerialize(serializer, 42L, 43L);
+            TestDictSerialize(serializer, 42ul, 43ul);
+            TestDictSerialize(serializer, 42.1f, 43.1f);
+            TestDictSerialize(serializer, 42.12, 45.23);
+            TestDictSerialize(serializer, 'b', 'a');
+            TestDictSerialize(serializer, true, false);
+            TestDictSerialize<object>(serializer, null, null);
+            TestDictSerialize(serializer, "ab", "be");
+            TestDictSerialize(serializer, 42.12m, 43.13m);
+            TestDictSerialize(serializer, DateTime.Now, DateTime.Today);
+            TestDictSerialize(serializer, TimeSpan.FromMinutes(5), TimeSpan.FromDays(3));
+        }
+
+        private static void TestDictSerialize<T>(ISerializer<string> serializer, params T[] inputs)
+        {
+            var input = new Dictionary<string, T>(
+                inputs.ToDictionary(k => k?.ToString() ?? Guid.NewGuid() + "", v => v));
+            TestPrimSerialize(serializer, input);
         }
 
         private static void TestListSerialize(ISerializer<string> serializer)
@@ -95,7 +126,7 @@ namespace NetSerializer.Test
         }
 
         private static string GetType(object obj)
-            => obj?.GetType().Name.Replace("`1", " ") + string.Join(" ",
+            => obj?.GetType().Name.Replace("`1", " ").Replace("`2", " ") + string.Join(" ",
                    obj?.GetType().GetGenericArguments().Select(t => t.Name).ToArray() ?? new string[0]);
 
         private static void TestArraySerialize(ISerializer<string> serializer)
