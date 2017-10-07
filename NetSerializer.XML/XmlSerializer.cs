@@ -25,7 +25,7 @@ namespace NetSerializer.XML
             xns = new XmlSerializerNamespaces();
             xns.Add(string.Empty, string.Empty);
             serializers = new Dictionary<Type, Xmler>();
-            WriteSettings = new XmlWriterSettings {OmitXmlDeclaration = true};
+            WriteSettings = new XmlWriterSettings { OmitXmlDeclaration = true };
             Mappings = new Dictionary<Type, Type>
             {
                 {typeof(TimeSpan), typeof(XmlTimeSpan)},
@@ -58,7 +58,7 @@ namespace NetSerializer.XML
                     rawType = type;
             Xmler xml;
             if (!serializers.TryGetValue(rawType, out xml))
-                serializers[type] = xml = new Xmler(rawType);
+                serializers[type] = xml = BuildSerializer(rawType);
             return xml;
         }
 
@@ -81,7 +81,7 @@ namespace NetSerializer.XML
             {
                 var raw = serializer.Deserialize(reader);
                 var conv = ChangeConvert(raw);
-                return (O) conv;
+                return (O)conv;
             }
         }
 
@@ -91,13 +91,13 @@ namespace NetSerializer.XML
             IDictionary dict;
             var raw = input;
             if (raw is TimeSpan)
-                raw = (XmlTimeSpan) (TimeSpan) raw;
+                raw = (XmlTimeSpan)(TimeSpan)raw;
             else if (raw is TimeSpan[])
-                raw = ((TimeSpan[]) raw).Select(t => (XmlTimeSpan) t).ToArray();
+                raw = ((TimeSpan[])raw).Select(t => (XmlTimeSpan)t).ToArray();
             else if (raw is XmlTimeSpan)
-                raw = (TimeSpan) (XmlTimeSpan) raw;
+                raw = (TimeSpan)(XmlTimeSpan)raw;
             else if (raw is XmlTimeSpan[])
-                raw = ((XmlTimeSpan[]) raw).Select(t => (TimeSpan) t).ToArray();
+                raw = ((XmlTimeSpan[])raw).Select(t => (TimeSpan)t).ToArray();
             else if ((dict = raw as IDictionary) != null)
             {
                 var args = raw.GetType().GetGenericArguments();
@@ -135,5 +135,23 @@ namespace NetSerializer.XML
         private bool TryGetValue(Type raw, out Type mapped)
             => Mappings.TryGetValue(raw, out mapped)
                || (mapped = Mappings.FirstOrDefault(m => m.Value == raw).Key) != null;
+
+        private Xmler BuildSerializer(Type rawType)
+        {
+            var propTypes = rawType.GetProperties().Select(p =>
+            {
+                Type mapped;
+                return TryGetValue(p.PropertyType, out mapped) ? new { Prop = p, Map = mapped } : null;
+            }).Where(p => p != null).ToArray();
+            if (!propTypes.Any())
+                return new Xmler(rawType);
+            var overrides = new XmlAttributeOverrides();
+            foreach (var pair in propTypes)
+                overrides.Add(rawType, pair.Prop.Name, new XmlAttributes
+                {
+                    XmlElements = { new XmlElementAttribute(pair.Map) }
+                });
+            return new Xmler(rawType, overrides);
+        }
     }
 }

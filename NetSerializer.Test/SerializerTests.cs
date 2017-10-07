@@ -22,6 +22,7 @@ namespace NetSerializer.Test
             TestMyArraySerialize(seri);
             TestMyListSerialize(seri);
             TestMyDictSerialize(seri);
+            TestMyObjSerialize(seri);
         }
 
         [Test]
@@ -32,6 +33,7 @@ namespace NetSerializer.Test
             TestMyArraySerialize(seri);
             TestMyListSerialize(seri);
             TestMyDictSerialize(seri);
+            TestMyObjSerialize(seri);
         }
 
         [Test]
@@ -42,6 +44,7 @@ namespace NetSerializer.Test
             TestMyArraySerialize(seri);
             TestMyListSerialize(seri);
             TestMyDictSerialize(seri);
+            TestMyObjSerialize(seri);
         }
 
         [Test]
@@ -52,6 +55,7 @@ namespace NetSerializer.Test
             TestMyArraySerialize(seri);
             TestMyListSerialize(seri);
             TestMyDictSerialize(seri);
+            TestMyObjSerialize(seri);
         }
 
         [Test]
@@ -62,7 +66,56 @@ namespace NetSerializer.Test
             TestMyArraySerialize(seri, utc: true);
             TestMyListSerialize(seri, utc: true);
             TestMyDictSerialize(seri, utc: true);
+            TestMyObjSerialize(seri, utc: true);
         }
+
+        private static void TestMyObjSerialize(ISerializer<string> serializer, bool utc = false)
+        {
+            var obj = new ExampleObject
+            {
+                Abyte = 127,
+                Asbyte = -128,
+                Aint = 42,
+                Auint = 42u,
+                Ashort = 42,
+                Aushort = 42,
+                Along = 42L,
+                Aulong = 42ul,
+                Afloat = 42.1f,
+                Adouble = 42.12,
+                Achar = 'b',
+                Abool = true,
+                Aobject = null,
+                Astring = "ab",
+                Adecimal = 42.12m,
+                AdateTime = utc ? DateTime.UtcNow : DateTime.Now,
+                AtimeSpan = TimeSpan.FromMinutes(5)
+            };
+            var text = serializer.Serialize(obj);
+            var parsed = serializer.Deserialize<ExampleObject>(text);
+            CompareObjProperty(obj, parsed, o => o.Abyte, text);
+            CompareObjProperty(obj, parsed, o => o.Asbyte, text);
+            CompareObjProperty(obj, parsed, o => o.Aint, text);
+            CompareObjProperty(obj, parsed, o => o.Auint, text);
+            CompareObjProperty(obj, parsed, o => o.Ashort, text);
+            CompareObjProperty(obj, parsed, o => o.Aushort, text);
+            CompareObjProperty(obj, parsed, o => o.Along, text);
+            CompareObjProperty(obj, parsed, o => o.Aulong, text);
+            CompareObjProperty(obj, parsed, o => o.Afloat, text);
+            CompareObjProperty(obj, parsed, o => o.Adouble, text);
+            CompareObjProperty(obj, parsed, o => o.Achar, text);
+            CompareObjProperty(obj, parsed, o => o.Abool, text);
+            CompareObjProperty(obj, parsed, o => o.Aobject, text);
+            CompareObjProperty(obj, parsed, o => o.Astring, text);
+            CompareObjProperty(obj, parsed, o => o.Adecimal, text);
+            CompareObjProperty(obj, parsed, o => o.AdateTime, text);
+            CompareObjProperty(obj, parsed, o => o.AtimeSpan, text);
+            CompareObjProperty(obj, parsed, o => o.ToString(), text);
+            Console.WriteLine($"[{GetType(obj)}] {CleanUp(text)}");
+        }
+
+        private static void CompareObjProperty<T, TS>(T input, T output, Func<T, TS> prop, string text)
+            => Assert.AreEqual(prop(input), prop(output), text);
 
         private static void TestMyDictSerialize(ISerializer<string> serializer, bool utc = false)
         {

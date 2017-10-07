@@ -9,6 +9,12 @@ namespace NetSerializer.MsgPack
 {
     public class MsgPackSerializer : ISerializer<string>
     {
+        public MsgPackSerializer()
+        {
+            var resolver = MessagePack.Resolvers.ContractlessStandardResolver.Instance;
+            MessagePackSerializer.SetDefaultResolver(resolver);
+        }
+
         public string Serialize<O>(O input)
         {
             if (input == null) return string.Empty;
