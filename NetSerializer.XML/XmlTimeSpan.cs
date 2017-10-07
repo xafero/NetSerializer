@@ -17,9 +17,9 @@ namespace NetSerializer.XML
             _value = source;
         }
 
-        public static implicit operator TimeSpan?(XmlTimeSpan o) => o?._value;
+        // public static implicit operator TimeSpan?(XmlTimeSpan o) => o?._value;
 
-        public static implicit operator XmlTimeSpan(TimeSpan? o) => o == null ? null : new XmlTimeSpan(o.Value);
+        // public static implicit operator XmlTimeSpan(TimeSpan? o) => o == null ? null : new XmlTimeSpan(o.Value);
 
         public static implicit operator TimeSpan(XmlTimeSpan o) => o?._value ?? default(TimeSpan);
 
