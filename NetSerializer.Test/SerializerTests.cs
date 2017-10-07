@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NetSerializer.API;
 using NetSerializer.Binary;
 using NetSerializer.JSON;
+using NetSerializer.MsgPack;
 using NetSerializer.XML;
 using NetSerializer.YAML;
 using NUnit.Framework;
@@ -48,6 +50,16 @@ namespace NetSerializer.Test
         {
             var seri = new BinarySerializer();
             TestPrimSerialize(seri);
+            TestArraySerialize(seri);
+            TestListSerialize(seri);
+            TestDictSerialize(seri);
+        }
+
+        [Test]
+        public void ShouldMsgPackSerialize()
+        {
+            var seri = new MsgPackSerializer();
+            TestPrimSerialize(seri, utc: true);
             TestArraySerialize(seri);
             TestListSerialize(seri);
             TestDictSerialize(seri);
@@ -108,7 +120,7 @@ namespace NetSerializer.Test
             TestPrimSerialize(serializer, input);
         }
 
-        private static void TestPrimSerialize(ISerializer<string> serializer)
+        private static void TestPrimSerialize(ISerializer<string> serializer, bool utc = false)
         {
             TestPrimSerialize<byte>(serializer, 127);
             TestPrimSerialize<sbyte>(serializer, -128);
@@ -125,7 +137,7 @@ namespace NetSerializer.Test
             TestPrimSerialize<object>(serializer, null);
             TestPrimSerialize(serializer, "ab");
             TestPrimSerialize(serializer, 42.12m);
-            TestPrimSerialize(serializer, DateTime.Now);
+            TestPrimSerialize(serializer, utc ? DateTime.UtcNow : DateTime.Now);
             TestPrimSerialize(serializer, TimeSpan.FromMinutes(5));
         }
 

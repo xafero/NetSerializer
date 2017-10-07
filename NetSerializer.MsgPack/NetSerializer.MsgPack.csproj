@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5E81823C-4AFC-4161-ABE4-1EFC8FFB0A81}</ProjectGuid>
+    <ProjectGuid>{C87B29C6-F047-4464-B8DD-BB3D89788AE0}</ProjectGuid>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetSerializer.Test</RootNamespace>
-    <AssemblyName>NetSerializer.Test</AssemblyName>
+    <RootNamespace>NetSerializer.MsgPack</RootNamespace>
+    <AssemblyName>NetSerializer.MsgPack</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -33,13 +33,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
-      <HintPath>..\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="MessagePack, Version=1.6.2.0, Culture=neutral, PublicKeyToken=b4a0369545f0a1be">
+      <HintPath>..\packages\MessagePack.1.6.2\lib\net45\MessagePack.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SerializerTests.cs" />
+    <Compile Include="MsgPackSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -49,26 +55,6 @@
     <ProjectReference Include="..\NetSerializer.API\NetSerializer.API.csproj">
       <Project>{980E6A06-31CA-465A-96C3-32055F4898FB}</Project>
       <Name>NetSerializer.API</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetSerializer.Binary\NetSerializer.Binary.csproj">
-      <Project>{C5B3F0FB-B5CC-4AF3-8756-46C9B3E96877}</Project>
-      <Name>NetSerializer.Binary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetSerializer.JSON\NetSerializer.JSON.csproj">
-      <Project>{E27965BC-FED6-464E-AF34-7DD73B929A48}</Project>
-      <Name>NetSerializer.JSON</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetSerializer.MsgPack\NetSerializer.MsgPack.csproj">
-      <Project>{C87B29C6-F047-4464-B8DD-BB3D89788AE0}</Project>
-      <Name>NetSerializer.MsgPack</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetSerializer.XML\NetSerializer.XML.csproj">
-      <Project>{7BA83049-056C-46AA-B693-952A051E64C9}</Project>
-      <Name>NetSerializer.XML</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetSerializer.YAML\NetSerializer.YAML.csproj">
-      <Project>{F3541CE5-4EDD-43EF-8670-E536D4D04245}</Project>
-      <Name>NetSerializer.YAML</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
