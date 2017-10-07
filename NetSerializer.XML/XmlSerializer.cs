@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -17,6 +19,7 @@ namespace NetSerializer.XML
         private readonly IDictionary<Type, Xmler> serializers;
 
         public XmlWriterSettings WriteSettings { get; }
+        public IDictionary<Type, Type> Mappings { get; }
 
         public XmlSerializer()
         {
@@ -24,15 +27,34 @@ namespace NetSerializer.XML
             xns.Add(string.Empty, string.Empty);
             serializers = new Dictionary<Type, Xmler>();
             WriteSettings = new XmlWriterSettings {OmitXmlDeclaration = true};
+            Mappings = new Dictionary<Type, Type>
+            {
+                {typeof(TimeSpan), typeof(XmlTimeSpan)},
+                {typeof(TimeSpan[]), typeof(XmlTimeSpan[])},
+            };
         }
 
         private Xmler GetXmler(Type type)
         {
-            var rawType = type;
-            if (rawType == typeof(TimeSpan))
-                rawType = typeof(XmlTimeSpan);
-            if (rawType == typeof(TimeSpan[]))
-                rawType = typeof(XmlTimeSpan[]);
+            Type rawType;
+            if (!Mappings.TryGetValue(type, out rawType))
+                if (type.IsGenericType)
+                {
+                    var genType = type.GetGenericTypeDefinition();
+                    var found = false;
+                    rawType = genType.MakeGenericType(type.GetGenericArguments().Select(t =>
+                    {
+                        var replaced = Mappings.TryGetValue(t, out rawType);
+                        if (!replaced)
+                            return t;
+                        found = true;
+                        return rawType;
+                    }).ToArray());
+                    if (found)
+                        Mappings[type] = rawType;
+                }
+                else
+                    rawType = type;
             Xmler xml;
             if (!serializers.TryGetValue(rawType, out xml))
                 serializers[type] = xml = new Xmler(rawType);
@@ -45,11 +67,7 @@ namespace NetSerializer.XML
             StringWriter writer;
             using (var xmlWriter = XmlWriter.Create(writer = new StringWriter(), WriteSettings))
             {
-                object raw = input;
-                if (raw is TimeSpan)
-                    raw = (XmlTimeSpan) (TimeSpan) raw;
-                if (raw is TimeSpan[])
-                    raw = ((TimeSpan[]) raw).Select(t => (XmlTimeSpan) t).ToArray();
+                var raw = ChangeConvert(input);
                 serializer.Serialize(xmlWriter, raw, xns);
                 return writer.ToString();
             }
@@ -61,12 +79,39 @@ namespace NetSerializer.XML
             using (var reader = new StringReader(input))
             {
                 var raw = serializer.Deserialize(reader);
-                if (raw is XmlTimeSpan)
-                    raw = (TimeSpan) (XmlTimeSpan) raw;
-                if (raw is XmlTimeSpan[])
-                    raw = ((XmlTimeSpan[]) raw).Select(t => (TimeSpan) t).ToArray();
-                return (O) raw;
+                var conv = ChangeConvert(raw);
+                return (O) conv;
             }
+        }
+
+        private object ChangeConvert(object input)
+        {
+            ICollection coll;
+            var raw = input;
+            if (raw is TimeSpan)
+                raw = (XmlTimeSpan) (TimeSpan) raw;
+            else if (raw is TimeSpan[])
+                raw = ((TimeSpan[]) raw).Select(t => (XmlTimeSpan) t).ToArray();
+            else if (raw is XmlTimeSpan)
+                raw = (TimeSpan) (XmlTimeSpan) raw;
+            else if (raw is XmlTimeSpan[])
+                raw = ((XmlTimeSpan[]) raw).Select(t => (TimeSpan) t).ToArray();
+            else if ((coll = raw as ICollection) != null)
+            {
+                Type mapped;
+                if (Mappings.TryGetValue(raw.GetType(), out mapped)
+                    || (mapped = Mappings.FirstOrDefault(m => m.Value == raw.GetType()).Key) != null)
+                {
+                    dynamic container = Activator.CreateInstance(mapped);
+                    foreach (var item in coll)
+                    {
+                        dynamic rawItem = ChangeConvert(item);
+                        container.Add(rawItem);
+                    }
+                    raw = container;
+                }
+            }
+            return raw;
         }
     }
 }
