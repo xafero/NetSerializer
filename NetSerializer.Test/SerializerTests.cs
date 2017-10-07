@@ -19,53 +19,53 @@ namespace NetSerializer.Test
         public void ShouldYamlSerialize()
         {
             var seri = new YamlSerializer();
-            TestPrimSerialize(seri);
-            TestArraySerialize(seri);
-            TestListSerialize(seri);
-            TestDictSerialize(seri);
+            TestMyPrimSerialize(seri);
+            TestMyArraySerialize(seri);
+            TestMyListSerialize(seri);
+            TestMyDictSerialize(seri);
         }
 
         [Test]
         public void ShouldJsonSerialize()
         {
             var seri = new JsonSerializer();
-            TestPrimSerialize(seri);
-            TestArraySerialize(seri);
-            TestListSerialize(seri);
-            TestDictSerialize(seri);
+            TestMyPrimSerialize(seri);
+            TestMyArraySerialize(seri);
+            TestMyListSerialize(seri);
+            TestMyDictSerialize(seri);
         }
 
         [Test]
         public void ShouldXmlSerialize()
         {
             var seri = new XmlSerializer();
-            TestPrimSerialize(seri);
-            TestArraySerialize(seri);
-            TestListSerialize(seri);
-            TestDictSerialize(seri);
+            TestMyPrimSerialize(seri);
+            TestMyArraySerialize(seri);
+            TestMyListSerialize(seri);
+            TestMyDictSerialize(seri);
         }
 
         [Test]
         public void ShouldBinarySerialize()
         {
             var seri = new BinarySerializer();
-            TestPrimSerialize(seri);
-            TestArraySerialize(seri);
-            TestListSerialize(seri);
-            TestDictSerialize(seri);
+            TestMyPrimSerialize(seri);
+            TestMyArraySerialize(seri);
+            TestMyListSerialize(seri);
+            TestMyDictSerialize(seri);
         }
 
         [Test]
         public void ShouldMsgPackSerialize()
         {
             var seri = new MsgPackSerializer();
-            TestPrimSerialize(seri, utc: true);
-            TestArraySerialize(seri);
-            TestListSerialize(seri);
-            TestDictSerialize(seri);
+            TestMyPrimSerialize(seri, utc: true);
+            TestMyArraySerialize(seri, utc: true);
+            TestMyListSerialize(seri, utc: true);
+            TestMyDictSerialize(seri, utc: true);
         }
 
-        private static void TestDictSerialize(ISerializer<string> serializer)
+        private static void TestMyDictSerialize(ISerializer<string> serializer, bool utc = false)
         {
             TestDictSerialize<byte>(serializer, 127, 128);
             TestDictSerialize<sbyte>(serializer, -128, -127);
@@ -82,7 +82,8 @@ namespace NetSerializer.Test
             TestDictSerialize<object>(serializer, null, null);
             TestDictSerialize(serializer, "ab", "be");
             TestDictSerialize(serializer, 42.12m, 43.13m);
-            TestDictSerialize(serializer, DateTime.Now, DateTime.Today);
+            TestDictSerialize(serializer, utc ? DateTime.UtcNow : DateTime.Now,
+                utc ? DateTime.UtcNow.Date : DateTime.Today);
             TestDictSerialize(serializer, TimeSpan.FromMinutes(5), TimeSpan.FromDays(3));
         }
 
@@ -93,7 +94,7 @@ namespace NetSerializer.Test
             TestPrimSerialize(serializer, input);
         }
 
-        private static void TestListSerialize(ISerializer<string> serializer)
+        private static void TestMyListSerialize(ISerializer<string> serializer, bool utc = false)
         {
             TestListSerialize<byte>(serializer, 127, 128);
             TestListSerialize<sbyte>(serializer, -128, -127);
@@ -110,7 +111,8 @@ namespace NetSerializer.Test
             TestListSerialize<object>(serializer, null, null);
             TestListSerialize(serializer, "ab", "be");
             TestListSerialize(serializer, 42.12m, 43.13m);
-            TestListSerialize(serializer, DateTime.Now, DateTime.Today);
+            TestListSerialize(serializer, utc ? DateTime.UtcNow : DateTime.Now,
+                utc ? DateTime.UtcNow.Date : DateTime.Today);
             TestListSerialize(serializer, TimeSpan.FromMinutes(5), TimeSpan.FromDays(3));
         }
 
@@ -120,7 +122,7 @@ namespace NetSerializer.Test
             TestPrimSerialize(serializer, input);
         }
 
-        private static void TestPrimSerialize(ISerializer<string> serializer, bool utc = false)
+        private static void TestMyPrimSerialize(ISerializer<string> serializer, bool utc = false)
         {
             TestPrimSerialize<byte>(serializer, 127);
             TestPrimSerialize<sbyte>(serializer, -128);
@@ -152,7 +154,7 @@ namespace NetSerializer.Test
             => obj?.GetType().Name.Replace("`1", " ").Replace("`2", " ") + string.Join(" ",
                    obj?.GetType().GetGenericArguments().Select(t => t.Name).ToArray() ?? new string[0]);
 
-        private static void TestArraySerialize(ISerializer<string> serializer)
+        private static void TestMyArraySerialize(ISerializer<string> serializer, bool utc = false)
         {
             TestArraySerialize<byte>(serializer, 127, 128);
             TestArraySerialize<sbyte>(serializer, -128, -127);
@@ -169,7 +171,8 @@ namespace NetSerializer.Test
             TestArraySerialize<object>(serializer, null, null);
             TestArraySerialize(serializer, "ab", "be");
             TestArraySerialize(serializer, 42.12m, 43.13m);
-            TestArraySerialize(serializer, DateTime.Now, DateTime.Today);
+            TestArraySerialize(serializer, utc ? DateTime.UtcNow : DateTime.Now,
+                utc ? DateTime.UtcNow.Date : DateTime.Today);
             TestArraySerialize(serializer, TimeSpan.FromMinutes(5), TimeSpan.FromDays(3));
         }
 
