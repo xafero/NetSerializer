@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NetSerializer.API;
+using NetSerializer.Binary;
 using NetSerializer.JSON;
 using NetSerializer.XML;
 using NetSerializer.YAML;
@@ -36,6 +37,16 @@ namespace NetSerializer.Test
         public void ShouldXmlSerialize()
         {
             var seri = new XmlSerializer();
+            TestPrimSerialize(seri);
+            TestArraySerialize(seri);
+            TestListSerialize(seri);
+            TestDictSerialize(seri);
+        }
+
+        [Test]
+        public void ShouldBinarySerialize()
+        {
+            var seri = new BinarySerializer();
             TestPrimSerialize(seri);
             TestArraySerialize(seri);
             TestListSerialize(seri);

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetSerializer.JSON", "NetSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetSerializer.XML", "NetSerializer.XML\NetSerializer.XML.csproj", "{7BA83049-056C-46AA-B693-952A051E64C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetSerializer.Binary", "NetSerializer.Binary\NetSerializer.Binary.csproj", "{C5B3F0FB-B5CC-4AF3-8756-46C9B3E96877}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{7BA83049-056C-46AA-B693-952A051E64C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BA83049-056C-46AA-B693-952A051E64C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BA83049-056C-46AA-B693-952A051E64C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5B3F0FB-B5CC-4AF3-8756-46C9B3E96877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5B3F0FB-B5CC-4AF3-8756-46C9B3E96877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5B3F0FB-B5CC-4AF3-8756-46C9B3E96877}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5B3F0FB-B5CC-4AF3-8756-46C9B3E96877}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
