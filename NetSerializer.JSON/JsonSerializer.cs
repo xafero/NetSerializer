@@ -1,5 +1,6 @@
 ﻿using NetSerializer.API;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 // ReSharper disable InconsistentNaming
 
@@ -11,7 +12,12 @@ namespace NetSerializer.JSON
 
         public JsonSerializer()
         {
-            Settings = new JsonSerializerSettings();
+            Settings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                Converters = {new StringEnumConverter()}
+            };
         }
 
         public string Serialize<O>(O input)
